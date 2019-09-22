@@ -29,8 +29,8 @@ public class MoneyTransactions {
 
     public BigDecimal getBalance() {
         return moneyTransactions.stream()
-                .map(t -> t.getMoneyDirection().equals(MoneyDirection.IN) ? t.getAmount().setScale(2, RoundingMode.HALF_EVEN) : t.getAmount().negate().setScale(2, RoundingMode.HALF_EVEN))
-                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
+                .map(t -> t.getMoneyDirection().equals(MoneyDirection.IN) ? t.getAmount() : t.getAmount().negate())
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b)).setScale(2, RoundingMode.HALF_EVEN);
     }
 
     public String getAllMoneyTransfersInJsonFormat() {
