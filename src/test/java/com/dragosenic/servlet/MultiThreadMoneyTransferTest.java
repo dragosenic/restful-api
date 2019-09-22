@@ -44,7 +44,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
     private static final int ACCOUNTS_COUNT = 10;   // <- number of randomly created testing accounts
     private static final int INITIAL_DEPOSIT = 20;  // <- initial amount to deposit to all accounts
     private static final int TRANSFERS_COUNT_PER_THREAD = 200;  // <- number of random money transfers to execute per thread
-    private static final int NUMBER_OF_THREADS = 5;
+    private static final int NUMBER_OF_THREADS = 5; // <- relevant only to test 4
 
     private String randomAmountToTransfer = "";
 
