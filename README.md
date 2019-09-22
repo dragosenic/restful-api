@@ -58,3 +58,26 @@ Here is the format of json POST to deposit money to one account:
 }
 ```
 
+Url to POST to create new account holder<br/>
+http://localhost:8080/account-holder
+
+here is the json data to POST to create new account holder:
+```sh
+{
+    "fullName": "John Lennon",
+    "emailPhoneAddress": "john@lennon.com, 0123-4567, 1 Great western road"
+}
+```
+
+Url to POST to create new account<br/>
+http://localhost:8080/account
+
+here is the json data to POST to create new account:
+```sh
+{
+    "type": "SAVING",
+    "accountHolder": {"id": "1234567890"}
+}
+```
+NOTE: type will hold one of the following; CHECKING, CLASSIC, SAVING or BROKERAGE
+
