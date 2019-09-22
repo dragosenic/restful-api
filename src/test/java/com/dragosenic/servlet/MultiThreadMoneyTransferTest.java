@@ -122,7 +122,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
     }
 
     /**
-     *  deposit the same amount of INITIAL_DEPOSIT to all accounts
+     *  Deposit the same amount of INITIAL_DEPOSIT to all accounts
      *
      *  @throws Exception
      */
@@ -160,6 +160,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
     }
 
     /**
+     *  Execute money transfers from multiple threads
      *  perform TRANSFERS_COUNT random money transfers per thread
      *
      *  @throws Exception
@@ -205,11 +206,12 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
             Account account = new Gson().fromJson(stringWriter.toString(), Account.class);
 
             Assertions.assertNotNull(account);
-            Assertions.assertTrue(account.getBalance().compareTo(BigDecimal.ZERO) != -1);
+            Assertions.assertTrue(account.getBalance().compareTo(BigDecimal.ZERO) != -1); // <- no account balance will bi lees then zero
 
             totalSum = totalSum.add(account.getBalance());
         }
 
+        // total sum of all account balances will remain constant
         Assertions.assertEquals(
                 new BigDecimal(INITIAL_DEPOSIT).multiply(new BigDecimal(ACCOUNTS_COUNT)).setScale(2, RoundingMode.HALF_EVEN),
                 totalSum);
