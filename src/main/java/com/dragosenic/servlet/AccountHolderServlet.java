@@ -62,9 +62,8 @@ public class AccountHolderServlet extends BaseServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try {
-            String x = "";
-            x = new MessageBody(request).getData();
-            int newAccountHolderId = super.DB().createNewAccountHolder(x);
+
+            int newAccountHolderId = super.DB().createNewAccountHolder(new MessageBody(request).getData());
 
             JsonObject toReturn = new JsonObject();
             toReturn.addProperty("accountHolderId", newAccountHolderId);
