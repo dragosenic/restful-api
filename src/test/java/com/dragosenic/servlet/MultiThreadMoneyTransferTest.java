@@ -73,7 +73,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
             accountHolderServlet().doPost(request, response);
         }
 
-        // get all account holders (i.e. two of them)
+        // get all account holders (i.e. four of them)
         super.mockGET("/account-holder", new HashMap<>());
         accountHolderServlet().doGet(request, response);
 
