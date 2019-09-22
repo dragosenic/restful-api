@@ -23,14 +23,14 @@ mvn exec:java -Dexec.mainClass="com.dragosenic.Main"
 
 Now the following API is ready to use:
 
-Url to GET all account holders<br/>
-http://localhost:8080/account-holder
+Url to GET all account holders <br/>
+http://localhost:8080/account-holder // <- some test data are already there
 
 Url to GET account holder by id<br/>
 http://localhost:8080/account-holder?id=123456789
 
 Url to GET all accounts<br/>
-http://localhost:8080/account
+http://localhost:8080/account // <- some test data are already there
 
 Url to GET account by id<br/>
 http://localhost:8080/account?accountNumber=1234567890
