@@ -35,7 +35,7 @@ http://localhost:8080/account // <- some test data are already there
 Url to GET account by id<br/>
 http://localhost:8080/account?accountNumber=1234567890
 
-Url to POST to tranfer money between two accounts or to deposit money to one account<br/>
+Url to POST to **tranfer money between two accounts** or to **deposit money** to one account<br/>
 http://localhost:8080/money-transfer
 
 Here is the format of json POST to transfer money between two accounts:
@@ -79,5 +79,5 @@ here is the json data to POST to create new account:
     "accountHolder": {"id": "1234567890"}
 }
 ```
-NOTE: type will hold one of the following; CHECKING, CLASSIC, SAVING or BROKERAGE
+("type" will hold one of the following; CHECKING, CLASSIC, SAVING or BROKERAGE)
 
