@@ -79,7 +79,6 @@ public class InMemoryDB {
         }
 
         Account toAccount = accounts.getAccountById(transferRequest.getAccountTo());
-
         if (toAccount == null) {
             throw new InvalidPostDataException("'To' Account not found");
         }
