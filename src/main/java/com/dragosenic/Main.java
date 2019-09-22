@@ -43,7 +43,7 @@ public class Main {
             sce.getServletContext().setAttribute("DB", new InMemoryDB());
 
             InMemoryDB DB = (InMemoryDB)sce.getServletContext().getAttribute("DB");
-            try {
+            try {// insert some test data for account holders and accounts
                 int accountHolderId1 = DB.createNewAccountHolder("{\"fullName\": \"John Lennon\", \"emailPhoneAddress\": \"john@lennon.com\"}");
                 int accountHolderId2 = DB.createNewAccountHolder("{\"fullName\": \"Paul McCartney\", \"emailPhoneAddress\": \"paul@mcca.co.uk\"}");
                 int accountHolderId3 = DB.createNewAccountHolder("{\"fullName\": \"George Harrison\", \"emailPhoneAddress\": \"george@harrison.co.uk\"}");
