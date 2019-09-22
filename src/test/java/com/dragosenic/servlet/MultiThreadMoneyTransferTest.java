@@ -194,7 +194,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
 
         Assertions.assertEquals(10, accounts.size());
 
-        //
+        // get each account separately and sums all balances
         BigDecimal totalSum = BigDecimal.ZERO;
         for (int i = 0; i < accountNumbers.size(); i++) {
             HashMap<String, String> params = new HashMap<>();
