@@ -23,6 +23,8 @@ mvn exec:java -Dexec.mainClass="com.dragosenic.Main"
 
 Now the following API is ready to use:
 
+#### Get accounts and account holders
+
 Url to GET all account holders <br/>
 http://localhost:8080/account-holder // <- some test data are already there
 
@@ -34,6 +36,8 @@ http://localhost:8080/account // <- some test data are already there
 
 Url to GET account by id<br/>
 http://localhost:8080/account?accountNumber=1234567890
+
+#### Transfer money between accounts
 
 Url to POST to **tranfer money between two accounts** or to **deposit money** to one account<br/>
 http://localhost:8080/money-transfer
@@ -57,6 +61,8 @@ Here is the format of json POST to deposit money to one account:
     "description": "descr.";
 }
 ```
+
+#### Create new account holder and new account
 
 Url to POST to create new account holder<br/>
 http://localhost:8080/account-holder
