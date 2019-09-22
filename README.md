@@ -1,4 +1,4 @@
-###Simple Java RESTful API
+## Simple Java RESTful API
 
 Simple Java RESTful API for money transfers between accounts.
 Standalone executable program with jetty server.
