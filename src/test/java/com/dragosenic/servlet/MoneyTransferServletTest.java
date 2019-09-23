@@ -66,7 +66,7 @@ class MoneyTransferServletTest extends MockedBaseServlet {
         accountHolderServlet().doGet(request, response);
 
         printWriter.flush();
-        ArrayList accountHolders = new Gson().fromJson(stringWriter.toString(), ArrayList.class);
+        ArrayList accountHolders = new Gson().fromJson(responseWriter.toString(), ArrayList.class);
 
         accountHolderId1 = ((Double)((LinkedTreeMap)accountHolders.get(0)).get("id")).intValue();
         accountHolderId2 = ((Double)((LinkedTreeMap)accountHolders.get(1)).get("id")).intValue();
@@ -99,7 +99,7 @@ class MoneyTransferServletTest extends MockedBaseServlet {
         accountServlet().doGet(request, response);
 
         printWriter.flush();
-        HashMap accounts = new Gson().fromJson(stringWriter.toString(), HashMap.class);
+        HashMap accounts = new Gson().fromJson(responseWriter.toString(), HashMap.class);
 
         Assertions.assertEquals(3, accounts.size());
 
@@ -131,7 +131,7 @@ class MoneyTransferServletTest extends MockedBaseServlet {
         accountServlet().doGet(request, response);
 
         printWriter.flush();
-        Account account = new Gson().fromJson(stringWriter.toString(), Account.class);
+        Account account = new Gson().fromJson(responseWriter.toString(), Account.class);
 
         // assert
         Assertions.assertTrue(account != null);
@@ -154,7 +154,7 @@ class MoneyTransferServletTest extends MockedBaseServlet {
         moneyTransferServlet().doPost(request, response);
 
         printWriter.flush();
-        Assertions.assertNotNull(stringWriter.toString());
+        Assertions.assertNotNull(responseWriter.toString());
 
         // 2. get all money transfers from second account (balance should stay 7.77)
         HashMap<String, String> params = new HashMap<>();
@@ -163,7 +163,7 @@ class MoneyTransferServletTest extends MockedBaseServlet {
         accountServlet().doGet(request, response);
 
         printWriter.flush();
-        Account account = new Gson().fromJson(stringWriter.toString(), Account.class);
+        Account account = new Gson().fromJson(responseWriter.toString(), Account.class);
 
         Assertions.assertNotNull(account);
         Assertions.assertEquals(
@@ -177,7 +177,7 @@ class MoneyTransferServletTest extends MockedBaseServlet {
         accountServlet().doGet(request, response);
 
         printWriter.flush();
-        account = new Gson().fromJson(stringWriter.toString(), Account.class);
+        account = new Gson().fromJson(responseWriter.toString(), Account.class);
 
         Assertions.assertNotNull(account);
         Assertions.assertEquals(

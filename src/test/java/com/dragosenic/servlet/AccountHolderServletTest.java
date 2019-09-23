@@ -34,7 +34,7 @@ class AccountHolderServletTest extends MockedBaseServlet {
         sccountHolderServlet().doPost(request, response);
 
         printWriter.flush();
-        Map result = new Gson().fromJson(stringWriter.toString(), Map.class);
+        Map result = new Gson().fromJson(responseWriter.toString(), Map.class);
 
         // assert
         Assertions.assertTrue(result.containsKey("accountHolderId"));
@@ -53,7 +53,7 @@ class AccountHolderServletTest extends MockedBaseServlet {
         sccountHolderServlet().doGet(request, response);
 
         printWriter.flush();
-        ArrayList result = new Gson().fromJson(stringWriter.toString(), ArrayList.class);
+        ArrayList result = new Gson().fromJson(responseWriter.toString(), ArrayList.class);
 
         // assert
         Assertions.assertEquals(2, result.size());

@@ -21,7 +21,7 @@ public class MockedBaseServlet extends Mockito {
     final protected ServletContext servletContext = Mockito.mock(ServletContext.class);
 
     protected PrintWriter printWriter = null;
-    protected StringWriter stringWriter = null;
+    protected StringWriter responseWriter = null;
 
     protected void mockPOST(String jsonData) throws IOException {
 
@@ -31,8 +31,8 @@ public class MockedBaseServlet extends Mockito {
         when(request.getCharacterEncoding()).thenReturn("UTF-8");
 
         // mock response
-        stringWriter = new StringWriter();
-        printWriter = new PrintWriter(stringWriter);
+        responseWriter = new StringWriter();
+        printWriter = new PrintWriter(responseWriter);
         when(response.getWriter()).thenReturn(printWriter);
 
         // mock servletContext which holds instance of InMemoryDB
@@ -49,8 +49,8 @@ public class MockedBaseServlet extends Mockito {
         }
 
         // mock response
-        stringWriter = new StringWriter();
-        printWriter = new PrintWriter(stringWriter);
+        responseWriter = new StringWriter();
+        printWriter = new PrintWriter(responseWriter);
         when(response.getWriter()).thenReturn(printWriter);
 
         // mock servletContext which holds instance of InMemoryDB

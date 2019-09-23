@@ -79,7 +79,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         accountHolderServlet().doGet(request, response);
 
         printWriter.flush();
-        ArrayList accountHolders = new Gson().fromJson(stringWriter.toString(), ArrayList.class);
+        ArrayList accountHolders = new Gson().fromJson(responseWriter.toString(), ArrayList.class);
 
         accountHolderIds = new ArrayList<>();
         for (int i = 0; i < accountHolders.size(); i++) {
@@ -112,7 +112,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         accountServlet().doGet(request, response);
 
         printWriter.flush();
-        HashMap accounts = new Gson().fromJson(stringWriter.toString(), HashMap.class);
+        HashMap accounts = new Gson().fromJson(responseWriter.toString(), HashMap.class);
 
         Assertions.assertEquals(ACCOUNTS_COUNT, accounts.size());
 
@@ -140,7 +140,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         accountServlet().doGet(request, response);
 
         printWriter.flush();
-        HashMap accounts = new Gson().fromJson(stringWriter.toString(), HashMap.class);
+        HashMap accounts = new Gson().fromJson(responseWriter.toString(), HashMap.class);
 
         Assertions.assertEquals(10, accounts.size());
 
@@ -152,7 +152,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
             accountServlet().doGet(request, response);
 
             printWriter.flush();
-            Account account = new Gson().fromJson(stringWriter.toString(), Account.class);
+            Account account = new Gson().fromJson(responseWriter.toString(), Account.class);
 
             Assertions.assertNotNull(account);
             Assertions.assertEquals(new BigDecimal(INITIAL_DEPOSIT + ".00"), account.getBalance());
@@ -191,7 +191,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         accountServlet().doGet(request, response);
 
         printWriter.flush();
-        HashMap accounts = new Gson().fromJson(stringWriter.toString(), HashMap.class);
+        HashMap accounts = new Gson().fromJson(responseWriter.toString(), HashMap.class);
 
         Assertions.assertEquals(10, accounts.size());
 
@@ -204,7 +204,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
             accountServlet().doGet(request, response);
 
             printWriter.flush();
-            Account account = new Gson().fromJson(stringWriter.toString(), Account.class);
+            Account account = new Gson().fromJson(responseWriter.toString(), Account.class);
 
             Assertions.assertNotNull(account);
             Assertions.assertTrue(account.getBalance().compareTo(BigDecimal.ZERO) != -1); // <- no account balance will bi lees then zero
