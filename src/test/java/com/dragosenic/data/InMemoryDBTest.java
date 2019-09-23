@@ -1,6 +1,8 @@
 package com.dragosenic.data;
 
 import com.dragosenic.common.InvalidPostDataException;
+import com.dragosenic.eBank.ElectronicBanking;
+import com.dragosenic.eBank.ElectronicBankingService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +11,7 @@ import java.math.BigDecimal;
 
 class InMemoryDBTest {
 
-    private InMemoryDB DB;
+    private ElectronicBankingService eB;
     private int holderId1 = 0;
     private int holderId2 = 0;
 
@@ -23,31 +25,31 @@ class InMemoryDBTest {
     @BeforeEach
     void init() {
 
-        DB = new InMemoryDB();
+        eB = new ElectronicBanking(new InMemoryDB());
         String errorMessage1 = null;
         String errorMessage2 = null;
         String errorMessage3 = null;
 
         // 1. create two account holders
         try {
-            holderId1 = DB.createNewAccountHolder("{\"fullName\": \"John Lennon\", \"emailPhoneAddress\": \"john@lennon.com\"}");
-            holderId2 = DB.createNewAccountHolder("{\"fullName\": \"Paul McCartney\", \"emailPhoneAddress\": \"paul@mcca.co.uk\"}");
+            holderId1 = eB.createNewAccountHolder("{\"fullName\": \"John Lennon\", \"emailPhoneAddress\": \"john@lennon.com\"}");
+            holderId2 = eB.createNewAccountHolder("{\"fullName\": \"Paul McCartney\", \"emailPhoneAddress\": \"paul@mcca.co.uk\"}");
         } catch (InvalidPostDataException e) {
             errorMessage1 = e.getMessage();
         }
 
         // 2. create three accounts
         try {
-            accountNumber1 = DB.createNewAccount("{\"type\": \"CHECKING\", \"accountHolder\": {\"id\": " + holderId1 + "}}");
-            accountNumber2 = DB.createNewAccount("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + holderId1 + "}}");
-            accountNumber3 = DB.createNewAccount("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + holderId2 + "}}");
+            accountNumber1 = eB.createNewAccount("{\"type\": \"CHECKING\", \"accountHolder\": {\"id\": " + holderId1 + "}}");
+            accountNumber2 = eB.createNewAccount("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + holderId1 + "}}");
+            accountNumber3 = eB.createNewAccount("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + holderId2 + "}}");
         } catch (InvalidPostDataException e) {
             errorMessage2 = e.getMessage();
         }
 
         // 3. deposit money to account 1
         try {
-            DB.createNewMoneyTransfer("{\"accountTo\": " + accountNumber1 + ", \"amount\": 1000, \"description\": \"initial deposit account 1\"}");
+            eB.createNewMoneyTransfer("{\"accountTo\": " + accountNumber1 + ", \"amount\": 1000, \"description\": \"initial deposit account 1\"}");
         } catch (InvalidPostDataException e) {
             errorMessage3 = e.getMessage();
         }
@@ -55,7 +57,7 @@ class InMemoryDBTest {
         // assert
         Assertions.assertEquals(
                 new BigDecimal("1000.00"),
-                DB.getAccounts().getAccountById(accountNumber1).getBalance());
+                eB.getAccounts().getAccountById(accountNumber1).getBalance());
 
         Assertions.assertNull(errorMessage1);
         Assertions.assertNull(errorMessage2);
@@ -75,7 +77,7 @@ class InMemoryDBTest {
         String errorMessage = null;
 
         try {
-            DB.createNewMoneyTransfer("{\"accountFrom\": " + accountNumber1 + ", \"accountTo\": " + accountNumber2 + ", \"amount\": 7.77, \"description\":\"descr.\" }");
+            eB.createNewMoneyTransfer("{\"accountFrom\": " + accountNumber1 + ", \"accountTo\": " + accountNumber2 + ", \"amount\": 7.77, \"description\":\"descr.\" }");
         } catch (InvalidPostDataException e) {
             errorMessage = e.getMessage();
         }
@@ -83,11 +85,11 @@ class InMemoryDBTest {
         // assert
         Assertions.assertEquals(
                 new BigDecimal("992.23"),
-                DB.getAccounts().getAccountById(accountNumber1).getBalance());
+                eB.getAccounts().getAccountById(accountNumber1).getBalance());
 
         Assertions.assertEquals(
                 new BigDecimal("7.77"),
-                DB.getAccounts().getAccountById(accountNumber2).getBalance());
+                eB.getAccounts().getAccountById(accountNumber2).getBalance());
 
         Assertions.assertNull(errorMessage);
     }
@@ -106,7 +108,7 @@ class InMemoryDBTest {
         String errorMessage = null;
 
         try {
-            DB.createNewMoneyTransfer("{\"accountFrom\": " + accountNumber1 + ", \"accountTo\": " + accountNumber2 + ", \"amount\": 1000.01}");
+            eB.createNewMoneyTransfer("{\"accountFrom\": " + accountNumber1 + ", \"accountTo\": " + accountNumber2 + ", \"amount\": 1000.01}");
         } catch (InvalidPostDataException e) {
             errorMessage = e.getMessage();
         }
@@ -115,10 +117,10 @@ class InMemoryDBTest {
         Assertions.assertTrue(errorMessage != null && errorMessage.length() > 0);
         Assertions.assertEquals(
                 new BigDecimal("1000.00"),
-                DB.getAccounts().getAccountById(accountNumber1).getBalance());
+                eB.getAccounts().getAccountById(accountNumber1).getBalance());
         Assertions.assertEquals(
                 new BigDecimal("0.00"),
-                DB.getAccounts().getAccountById(accountNumber2).getBalance());
+                eB.getAccounts().getAccountById(accountNumber2).getBalance());
     }
 
     /**
@@ -138,8 +140,8 @@ class InMemoryDBTest {
         String errorMessage = null;
 
         try {
-            DB.createNewMoneyTransfer("{\"accountFrom\": " + accountNumber1 + ", \"accountTo\": " + accountNumber2 + ", \"amount\": 7.77 }");
-            DB.createNewMoneyTransfer("{\"accountFrom\": " + accountNumber2 + ", \"accountTo\": " + accountNumber3 + ", \"amount\": 10 }");
+            eB.createNewMoneyTransfer("{\"accountFrom\": " + accountNumber1 + ", \"accountTo\": " + accountNumber2 + ", \"amount\": 7.77 }");
+            eB.createNewMoneyTransfer("{\"accountFrom\": " + accountNumber2 + ", \"accountTo\": " + accountNumber3 + ", \"amount\": 10 }");
         } catch (InvalidPostDataException e) {
             errorMessage = e.getMessage();
         }
@@ -148,13 +150,13 @@ class InMemoryDBTest {
         Assertions.assertTrue(errorMessage != null && errorMessage.length() > 0);
         Assertions.assertEquals(
                 new BigDecimal("992.23"),
-                DB.getAccounts().getAccountById(accountNumber1).getBalance());
+                eB.getAccounts().getAccountById(accountNumber1).getBalance());
         Assertions.assertEquals(
                 new BigDecimal("7.77"),
-                DB.getAccounts().getAccountById(accountNumber2).getBalance());
+                eB.getAccounts().getAccountById(accountNumber2).getBalance());
         Assertions.assertEquals(
                 new BigDecimal("0.00"),
-                DB.getAccounts().getAccountById(accountNumber3).getBalance());
+                eB.getAccounts().getAccountById(accountNumber3).getBalance());
     }
 
 }

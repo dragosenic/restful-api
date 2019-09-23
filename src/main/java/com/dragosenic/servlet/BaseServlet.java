@@ -1,6 +1,6 @@
 package com.dragosenic.servlet;
 
-import com.dragosenic.data.InMemoryDB;
+import com.dragosenic.eBank.ElectronicBankingService;
 import com.google.gson.JsonObject;
 
 import javax.servlet.http.HttpServlet;
@@ -9,8 +9,8 @@ import java.io.IOException;
 
 public class BaseServlet extends HttpServlet {
 
-    protected InMemoryDB DB() {
-        return (InMemoryDB)getServletContext().getAttribute("DB");
+    protected ElectronicBankingService eB() {
+        return (ElectronicBankingService)getServletContext().getAttribute("eB");
     }
 
     protected void serveTheResponse(HttpServletResponse response, String jsonString) throws IOException {

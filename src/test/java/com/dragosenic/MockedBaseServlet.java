@@ -1,6 +1,8 @@
 package com.dragosenic;
 
 import com.dragosenic.data.InMemoryDB;
+import com.dragosenic.eBank.ElectronicBanking;
+import com.dragosenic.eBank.ElectronicBankingService;
 import org.mockito.Mockito;
 
 import javax.servlet.ServletContext;
@@ -12,7 +14,7 @@ import java.util.Map;
 
 public class MockedBaseServlet extends Mockito {
 
-    protected static InMemoryDB DB = new InMemoryDB();
+    protected static ElectronicBankingService eB = new ElectronicBanking(new InMemoryDB());
 
     final protected HttpServletRequest request = mock(HttpServletRequest.class);
     final protected HttpServletResponse response = mock(HttpServletResponse.class);
@@ -34,7 +36,7 @@ public class MockedBaseServlet extends Mockito {
         when(response.getWriter()).thenReturn(printWriter);
 
         // mock servletContext which holds instance of InMemoryDB
-        when(servletContext.getAttribute("DB")).thenReturn(DB);
+        when(servletContext.getAttribute("eB")).thenReturn(eB);
     }
 
     protected void mockGET(String pathInfo, HashMap<String, String> urlParameters) throws IOException {
@@ -52,7 +54,7 @@ public class MockedBaseServlet extends Mockito {
         when(response.getWriter()).thenReturn(printWriter);
 
         // mock servletContext which holds instance of InMemoryDB
-        when(servletContext.getAttribute("DB")).thenReturn(DB);
+        when(servletContext.getAttribute("eB")).thenReturn(eB);
     }
 
 }

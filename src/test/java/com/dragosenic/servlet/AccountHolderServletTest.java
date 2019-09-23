@@ -2,6 +2,7 @@ package com.dragosenic.servlet;
 
 import com.dragosenic.MockedBaseServlet;
 import com.dragosenic.data.InMemoryDB;
+import com.dragosenic.eBank.ElectronicBanking;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +23,7 @@ class AccountHolderServletTest extends MockedBaseServlet {
 
     @BeforeAll
     static void initDB() {
-        MockedBaseServlet.DB = new InMemoryDB();
+        MockedBaseServlet.eB = new ElectronicBanking(new InMemoryDB());
     }
 
     @Test

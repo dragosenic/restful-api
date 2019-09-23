@@ -30,11 +30,11 @@ public class AccountHolderServlet extends BaseServlet {
 
         if (id.isNull()) {
 
-            super.serveTheResponse(response, super.DB().getAccountHolders().getAllAccountHoldersInJsonFormat());
+            super.serveTheResponse(response, super.eB().getAccountHolders().getAllAccountHoldersInJsonFormat());
 
         } else if (id.isInteger()) {
 
-            AccountHolder accountHolder = super.DB().getAccountHolders().getAccountHolderById(id.asInteger());
+            AccountHolder accountHolder = super.eB().getAccountHolders().getAccountHolderById(id.asInteger());
             if (accountHolder != null) {
                 super.serveTheResponse(response, new Gson().toJson(accountHolder));
             } else {
@@ -63,7 +63,7 @@ public class AccountHolderServlet extends BaseServlet {
 
         try {
 
-            int newAccountHolderId = super.DB().createNewAccountHolder(new MessageBody(request).getData());
+            int newAccountHolderId = super.eB().createNewAccountHolder(new MessageBody(request).getData());
 
             JsonObject toReturn = new JsonObject();
             toReturn.addProperty("accountHolderId", newAccountHolderId);

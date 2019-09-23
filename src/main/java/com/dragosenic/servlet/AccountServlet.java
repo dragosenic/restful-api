@@ -29,11 +29,11 @@ public class AccountServlet extends BaseServlet {
 
         if (accountNumber.isNull()) {
 
-            super.serveTheResponse(response, super.DB().getAccounts().getAllAccountsInJsonFormat());
+            super.serveTheResponse(response, super.eB().getAccounts().getAllAccountsInJsonFormat());
 
         } else if (accountNumber.isInteger()) {
 
-            Account account = super.DB().getAccounts().getAccountById(accountNumber.asInteger());
+            Account account = super.eB().getAccounts().getAccountById(accountNumber.asInteger());
             if (account != null) {
                 super.serveTheResponse(response, new Gson().toJson(account));
             } else {
@@ -64,7 +64,7 @@ public class AccountServlet extends BaseServlet {
 
         try {
 
-            int newAccountNumber = super.DB().createNewAccount(new MessageBody(request).getData());
+            int newAccountNumber = super.eB().createNewAccount(new MessageBody(request).getData());
 
             JsonObject toReturn = new JsonObject();
             toReturn.addProperty("accountNumber", newAccountNumber);

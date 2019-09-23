@@ -29,7 +29,7 @@ public class MoneyTransferServlet extends BaseServlet {
         try {
 
             synchronized (request){
-                super.DB().createNewMoneyTransfer(new MessageBody(request).getData());
+                super.eB().createNewMoneyTransfer(new MessageBody(request).getData());
             }
 
             JsonObject toReturn = new JsonObject();

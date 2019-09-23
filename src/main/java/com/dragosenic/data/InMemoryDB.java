@@ -4,12 +4,12 @@ import com.dragosenic.common.InvalidPostDataException;
 import com.dragosenic.common.MoneyDirection;
 import com.dragosenic.model.Account;
 import com.dragosenic.model.AccountHolder;
+import com.dragosenic.eBank.DatabaseService;
 import com.dragosenic.model.TransferRequest;
-import com.google.gson.Gson;
 
 import java.math.BigDecimal;
 
-public class InMemoryDB {
+public class InMemoryDB implements DatabaseService {
 
     private AccountHolders accountHolders;
     private Accounts accounts;
@@ -27,14 +27,7 @@ public class InMemoryDB {
         return accounts;
     }
 
-    public int createNewAccount(String jsonData) throws InvalidPostDataException {
-
-        Account account = null;
-        try {
-            account = new Gson().fromJson(jsonData, Account.class);
-        } catch (Exception e) {
-            throw new InvalidPostDataException("Invalid POST data: " + e.getMessage());
-        }
+    public int createNewAccount(Account account) throws InvalidPostDataException {
 
         int newAccountNumber = 0;
         try {
@@ -48,14 +41,7 @@ public class InMemoryDB {
         return newAccountNumber;
     }
 
-    public int createNewAccountHolder(String jsonData) throws InvalidPostDataException {
-
-        AccountHolder accountHolder = null;
-        try {
-            accountHolder = new Gson().fromJson(jsonData, AccountHolder.class);
-        } catch (Exception e) {
-            throw new InvalidPostDataException("Invalid POST data: " + e.getMessage());
-        }
+    public int createNewAccountHolder(AccountHolder accountHolder) throws InvalidPostDataException {
 
         int accountHolderId = 0;
         try {
@@ -69,28 +55,16 @@ public class InMemoryDB {
         return accountHolderId;
     }
 
-    public void createNewMoneyTransfer(String jsonData) throws InvalidPostDataException {
-
-        TransferRequest transferRequest = null;
-        try {
-            transferRequest = new Gson().fromJson(jsonData, TransferRequest.class);
-        } catch (Exception e) {
-            throw new InvalidPostDataException("Invalid POST data: " + e.getMessage());
-        }
+    public void createNewMoneyTransfer(TransferRequest transferRequest) throws InvalidPostDataException {
 
         Account toAccount = accounts.getAccountById(transferRequest.getAccountTo());
         if (toAccount == null) {
             throw new InvalidPostDataException("'To' Account not found");
         }
 
-        BigDecimal amount = new BigDecimal(transferRequest.getAmount());
-        if (amount.compareTo(BigDecimal.ZERO) != 1) {
-            throw new InvalidPostDataException("Amount to transfer is not provided or not valid");
-        }
+        Account fromAccount = accounts.getAccountById(transferRequest.getAccountFrom());
 
         try {
-
-            Account fromAccount = accounts.getAccountById(transferRequest.getAccountFrom());
 
             if (fromAccount != null) {
                 this.transferMoney(

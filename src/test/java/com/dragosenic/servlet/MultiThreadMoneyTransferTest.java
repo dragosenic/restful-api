@@ -3,6 +3,7 @@ package com.dragosenic.servlet;
 import com.dragosenic.MockedBaseServlet;
 import com.dragosenic.data.InMemoryDB;
 import com.dragosenic.model.Account;
+import com.dragosenic.eBank.ElectronicBanking;
 import com.dragosenic.utilities.RND;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -50,7 +51,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
 
     @BeforeAll
     static void initDB() {
-        MockedBaseServlet.DB = new InMemoryDB();
+        MockedBaseServlet.eB = new ElectronicBanking(new InMemoryDB());
     }
 
     /**

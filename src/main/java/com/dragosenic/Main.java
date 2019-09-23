@@ -2,6 +2,8 @@ package com.dragosenic;
 
 import com.dragosenic.common.InvalidPostDataException;
 import com.dragosenic.data.InMemoryDB;
+import com.dragosenic.eBank.ElectronicBanking;
+import com.dragosenic.eBank.ElectronicBankingService;
 import com.dragosenic.servlet.AccountHolderServlet;
 import com.dragosenic.servlet.AccountServlet;
 import com.dragosenic.servlet.MoneyTransferServlet;
@@ -40,18 +42,18 @@ public class Main {
         @Override
         public void contextInitialized(ServletContextEvent sce)
         {
-            sce.getServletContext().setAttribute("DB", new InMemoryDB());
+            sce.getServletContext().setAttribute("eB", new ElectronicBanking(new InMemoryDB()));
 
-            InMemoryDB DB = (InMemoryDB)sce.getServletContext().getAttribute("DB");
+            ElectronicBankingService eB = (ElectronicBankingService)sce.getServletContext().getAttribute("eB");
             try {// insert some test data for account holders and accounts
-                int accountHolderId1 = DB.createNewAccountHolder("{\"fullName\": \"John Lennon\", \"emailPhoneAddress\": \"john@lennon.com\"}");
-                int accountHolderId2 = DB.createNewAccountHolder("{\"fullName\": \"Paul McCartney\", \"emailPhoneAddress\": \"paul@mcca.co.uk\"}");
-                int accountHolderId3 = DB.createNewAccountHolder("{\"fullName\": \"George Harrison\", \"emailPhoneAddress\": \"george@harrison.co.uk\"}");
-                int accountHolderId4 = DB.createNewAccountHolder("{\"fullName\": \"Ringo Starr\", \"emailPhoneAddress\": \"ringo@starr.co.uk\"}");
+                int accountHolderId1 = eB.createNewAccountHolder("{\"fullName\": \"John Lennon\", \"emailPhoneAddress\": \"john@lennon.com\"}");
+                int accountHolderId2 = eB.createNewAccountHolder("{\"fullName\": \"Paul McCartney\", \"emailPhoneAddress\": \"paul@mcca.co.uk\"}");
+                int accountHolderId3 = eB.createNewAccountHolder("{\"fullName\": \"George Harrison\", \"emailPhoneAddress\": \"george@harrison.co.uk\"}");
+                int accountHolderId4 = eB.createNewAccountHolder("{\"fullName\": \"Ringo Starr\", \"emailPhoneAddress\": \"ringo@starr.co.uk\"}");
 
-                int accountId1 = DB.createNewAccount("{\"type\": \"CHECKING\", \"accountHolder\": {\"id\": " + accountHolderId1 + "}}");
-                int accountId2 = DB.createNewAccount("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + accountHolderId1 + "}}");
-                int accountId3 = DB.createNewAccount("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + accountHolderId2 + "}}");
+                int accountId1 = eB.createNewAccount("{\"type\": \"CHECKING\", \"accountHolder\": {\"id\": " + accountHolderId1 + "}}");
+                int accountId2 = eB.createNewAccount("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + accountHolderId1 + "}}");
+                int accountId3 = eB.createNewAccount("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + accountHolderId2 + "}}");
             } catch (InvalidPostDataException e) {
                 e.printStackTrace();
             }
