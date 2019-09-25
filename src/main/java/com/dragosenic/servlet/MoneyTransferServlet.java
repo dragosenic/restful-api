@@ -20,7 +20,7 @@ public class MoneyTransferServlet extends BaseServlet {
      *      "accountFrom": "1234567890",    // <- if accountFrom is not provided then it will only deposit money to accountTo
      *      "accountTo": "1234567891",
      *      "amount": "100.50",
-     *      "description": "descr.";
+     *      "description": "descr."
      *  }
      */
     @Override

@@ -48,7 +48,7 @@ Here is the format of json POST to transfer money between two accounts:
     "accountFrom": "1234567891",
     "accountTo": "1234567890",
     "amount": "10.00",
-    "description": "descr.";
+    "description": "descr."
 }
 ```
 
@@ -58,7 +58,7 @@ Here is the format of json POST to deposit money to one account:
 {
     "accountTo": "1234567891",
     "amount": "111.11",
-    "description": "descr.";
+    "description": "descr."
 }
 ```
 

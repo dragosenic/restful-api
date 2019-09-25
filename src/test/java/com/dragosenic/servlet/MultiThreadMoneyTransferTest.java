@@ -142,7 +142,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         printWriter.flush();
         HashMap accounts = new Gson().fromJson(responseWriter.toString(), HashMap.class);
 
-        Assertions.assertEquals(10, accounts.size());
+        Assertions.assertEquals(ACCOUNTS_COUNT, accounts.size());
 
         //
         for (int i = 0; i < accountNumbers.size(); i++) {
@@ -193,7 +193,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         printWriter.flush();
         HashMap accounts = new Gson().fromJson(responseWriter.toString(), HashMap.class);
 
-        Assertions.assertEquals(10, accounts.size());
+        Assertions.assertEquals(ACCOUNTS_COUNT, accounts.size());
 
         // get each account separately and sums all balances
         BigDecimal totalSum = BigDecimal.ZERO;
