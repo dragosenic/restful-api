@@ -56,7 +56,6 @@ public class Accounts {
     }
 
     public String getAllAccountsInJsonFormat() {
-        Gson gson = new Gson();
-        return gson.toJson(accounts);
+        return new Gson().toJson(accounts);
     }
 }

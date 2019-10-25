@@ -47,7 +47,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
     private static final int TRANSFERS_COUNT_PER_THREAD = 200;  // <- number of random money transfers to execute per thread
     private static final int NUMBER_OF_THREADS = 5; // <- relevant only to test 4
 
-    private String randomAmountToTransfer = "";
+    private final String mutex = "x";
 
     @BeforeAll
     static void initDB() {
@@ -224,8 +224,8 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         try {
 
             for (int i = 0; i < moneyTransfersCount; i++) {
-                synchronized (randomAmountToTransfer) {
-                    randomAmountToTransfer = String.format("%.2f", ((double)(RND.generateRandomInteger(1, INITIAL_DEPOSIT * 100)) / 100)); // <- random amount between 00.01 and INITIAL_DEPOSIT
+                synchronized (mutex) {
+                    String randomAmountToTransfer = String.format("%.2f", ((double)(RND.generateRandomInteger(1, INITIAL_DEPOSIT * 100)) / 100)); // <- random amount between 00.01 and INITIAL_DEPOSIT
 
                     int randomAccountNumberFrom = 0;
                     int randomAccountNumberTo = 0;
@@ -241,9 +241,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
                 }
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ServletException e) {
+        } catch (IOException | ServletException e) {
             e.printStackTrace();
         }
 
