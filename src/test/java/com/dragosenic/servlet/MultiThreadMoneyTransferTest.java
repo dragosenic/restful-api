@@ -19,7 +19,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
+class MultiThreadMoneyTransferTest extends MockedBaseServlet {
 
     private AccountHolderServlet accountHolderServlet() {
         return new AccountHolderServlet() {
@@ -47,7 +47,7 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
     private static final int TRANSFERS_COUNT_PER_THREAD = 200;  // <- number of random money transfers to execute per thread
     private static final int NUMBER_OF_THREADS = 5; // <- relevant only to test 4
 
-    private final String mutex = "x";
+    private static final String mutex = "x";
 
     @BeforeAll
     static void initDB() {
@@ -69,8 +69,8 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
                 {"Ringo Starr", "ringo@starr.com"}};
 
         // create account holders
-        for (int i = 0; i < testdata.length; i++) {
-            super.mockPOST("{\"fullName\": \"" + testdata[i][0] + "\", \"emailPhoneAddress\": \"" + testdata[i][1] + "\"}");
+        for (String[] testd : testdata) {
+            super.mockPOST("{\"fullName\": \"" + testd[0] + "\", \"emailPhoneAddress\": \"" + testd[1] + "\"}");
             accountHolderServlet().doPost(request, response);
         }
 
@@ -82,8 +82,8 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         ArrayList accountHolders = new Gson().fromJson(responseWriter.toString(), ArrayList.class);
 
         accountHolderIds = new ArrayList<>();
-        for (int i = 0; i < accountHolders.size(); i++) {
-            accountHolderIds.add(((Double)((LinkedTreeMap)accountHolders.get(i)).get("id")).intValue());
+        for (Object accountHolder : accountHolders) {
+            accountHolderIds.add(((Double) ((LinkedTreeMap) accountHolder).get("id")).intValue());
         }
 
         Assertions.assertEquals(testdata.length, accountHolderIds.size());
@@ -130,8 +130,8 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
     @Test
     void multiThreadMoneyTransferTest3() throws Exception {
 
-        for (int i = 0; i < accountNumbers.size(); i++) {
-            super.mockPOST("{\"accountTo\": " + accountNumbers.get(i) + ", \"amount\": " + INITIAL_DEPOSIT + " }");
+        for (Integer accountNumber : accountNumbers) {
+            super.mockPOST("{\"accountTo\": " + accountNumber + ", \"amount\": " + INITIAL_DEPOSIT + " }");
             moneyTransferServlet().doPost(request, response);
         }
 
@@ -145,9 +145,9 @@ public class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         Assertions.assertEquals(ACCOUNTS_COUNT, accounts.size());
 
         //
-        for (int i = 0; i < accountNumbers.size(); i++) {
+        for (Integer accountNumber : accountNumbers) {
             HashMap<String, String> params = new HashMap<>();
-            params.put("accountNumber", accountNumbers.get(i).toString());
+            params.put("accountNumber", accountNumber.toString());
             super.mockGET("/account", params);
             accountServlet().doGet(request, response);
 

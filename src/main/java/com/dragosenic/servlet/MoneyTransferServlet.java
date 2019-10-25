@@ -11,6 +11,8 @@ import java.io.IOException;
 
 public class MoneyTransferServlet extends BaseServlet {
 
+    private static final String mutex = "x";
+
     /**
      *  Create money transfer between two accounts: accountFrom and accountTo
      *  or make deposit to accountTo if accountFrom is not provided.
@@ -28,7 +30,7 @@ public class MoneyTransferServlet extends BaseServlet {
 
         try {
 
-            synchronized (request){
+            synchronized (mutex){
                 super.eB().createNewMoneyTransfer(new MessageBody(request).getData());
             }
 
