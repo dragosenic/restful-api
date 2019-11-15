@@ -8,6 +8,7 @@ import com.dragosenic.utilities.RND;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Accounts {
 
@@ -56,6 +57,11 @@ public class Accounts {
     }
 
     public String getAllAccountsInJsonFormat() {
+
+        for (Map.Entry me : accounts.entrySet()) {
+            ((Account)me.getValue()).setBalance(((Account) me.getValue()).getBalance());
+        }
+
         return new Gson().toJson(accounts);
     }
 }

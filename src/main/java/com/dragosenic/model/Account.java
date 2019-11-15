@@ -19,6 +19,8 @@ public class Account {
 
     private MoneyTransactions moneyTransactions;
 
+    private BigDecimal balance;
+
     public Account(int accountNumber, AccountHolder accountHolder) {
         this.accountNumber = accountNumber;
         this.accountHolder = accountHolder;
@@ -40,4 +42,5 @@ public class Account {
     public MoneyTransactions getMoneyTransactions() { return moneyTransactions; }
 
     public BigDecimal getBalance() { return moneyTransactions.getBalance().setScale(2, RoundingMode.HALF_EVEN); }
+    public void setBalance(BigDecimal v) { this.balance = v; }
 }

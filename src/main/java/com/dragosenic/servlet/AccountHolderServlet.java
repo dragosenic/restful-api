@@ -59,7 +59,7 @@ public class AccountHolderServlet extends BaseServlet {
      *  fullName id and emailPhoneAddress must have values
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try {
 

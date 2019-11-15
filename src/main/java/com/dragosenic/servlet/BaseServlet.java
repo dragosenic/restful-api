@@ -24,7 +24,8 @@ public class BaseServlet extends HttpServlet {
     }
 
     protected void serveTheError(HttpServletResponse response, String errorMessage) throws IOException {
-        System.out.println(errorMessage);
+//        System.out.println(errorMessage);
+       // System.out.print('x');
 
         JsonObject jsonError = new JsonObject();
         jsonError.addProperty("error", errorMessage);

@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class MoneyTransferServlet extends BaseServlet {
 
-    private static final String mutex = "x";
+    private static final String mutex = "_";
 
     /**
      *  Create money transfer between two accounts: accountFrom and accountTo
@@ -26,12 +26,14 @@ public class MoneyTransferServlet extends BaseServlet {
      *  }
      */
     @Override
-    protected void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try {
 
-            synchronized (mutex){
-                super.eB().createNewMoneyTransfer(new MessageBody(request).getData());
+            String data = new MessageBody(request).getData();
+
+            synchronized (mutex) {
+                super.eB().createNewMoneyTransfer(data);
             }
 
             JsonObject toReturn = new JsonObject();
@@ -40,7 +42,7 @@ public class MoneyTransferServlet extends BaseServlet {
 
         } catch (InvalidPostDataException e) {
 
-            super.serveTheError(response, e.toString());
+            super.serveTheError(response,  e.toString());
 
         }
     }

@@ -23,7 +23,7 @@ public class AccountServlet extends BaseServlet {
      *  /account  <-  to get all accounts
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         UrlParameter accountNumber = new UrlParameter(request.getParameter("accountNumber"));
 

@@ -1,5 +1,6 @@
 package com.dragosenic.servlet;
 
+import com.dragosenic.HttpMock;
 import com.dragosenic.MockedBaseServlet;
 import com.dragosenic.data.InMemoryDB;
 import com.dragosenic.model.Account;
@@ -19,19 +20,19 @@ class MoneyTransferServletTest extends MockedBaseServlet {
 
     private AccountHolderServlet accountHolderServlet() {
         return new AccountHolderServlet() {
-            public ServletContext getServletContext() { return servletContext; }
+            public ServletContext getServletContext() { return http.getServlet().getServletContext(); }
         };
     }
 
     private AccountServlet accountServlet() {
         return new AccountServlet() {
-            public ServletContext getServletContext() { return servletContext; }
+            public ServletContext getServletContext() { return http.getServlet().getServletContext(); }
         };
     }
 
     private MoneyTransferServlet moneyTransferServlet() {
         return new MoneyTransferServlet() {
-            public ServletContext getServletContext() { return servletContext; }
+            public ServletContext getServletContext() { return http.getServlet().getServletContext(); }
         };
     }
 
@@ -40,9 +41,12 @@ class MoneyTransferServletTest extends MockedBaseServlet {
 
     private static ArrayList<Integer> accountNumbers = null; // <- will hold a value after test 2
 
+    private static HttpMock http;
+
     @BeforeAll
     static void initDB() {
         MockedBaseServlet.eB = new ElectronicBanking(new InMemoryDB());
+        http = new HttpMock(MockedBaseServlet.eB);
     }
 
     /**
@@ -54,19 +58,19 @@ class MoneyTransferServletTest extends MockedBaseServlet {
     void accountHolderServletTest1() throws Exception {
 
         // create account holder 1
-        super.mockPOST("{\"fullName\": \"John Lennon\", \"emailPhoneAddress\": \"john@lennon.com\"}");
-        accountHolderServlet().doPost(request, response);
+        http.mockPOST("{\"fullName\": \"John Lennon\", \"emailPhoneAddress\": \"john@lennon.com\"}");
+        accountHolderServlet().doPost(http.getRequest(), http.getResponse());
 
         // create account holder 2
-        super.mockPOST("{\"fullName\": \"Paul McCartney\", \"emailPhoneAddress\": \"paul@mcca.co.uk\"}");
-        accountHolderServlet().doPost(request, response);
+        http.mockPOST("{\"fullName\": \"Paul McCartney\", \"emailPhoneAddress\": \"paul@mcca.co.uk\"}");
+        accountHolderServlet().doPost(http.getRequest(), http.getResponse());
 
         // get all account holders (i.e. two of them)
-        super.mockGET("/account-holder", new HashMap<>());
-        accountHolderServlet().doGet(request, response);
+        http.mockGET("/account-holder", new HashMap<>());
+        accountHolderServlet().doGet(http.getRequest(), http.getResponse());
 
-        printWriter.flush();
-        ArrayList accountHolders = new Gson().fromJson(responseWriter.toString(), ArrayList.class);
+        http.getPrintWriter().flush();
+        ArrayList accountHolders = new Gson().fromJson(http.getResponseWriter().toString(), ArrayList.class);
 
         accountHolderId1 = ((Double)((LinkedTreeMap)accountHolders.get(0)).get("id")).intValue();
         accountHolderId2 = ((Double)((LinkedTreeMap)accountHolders.get(1)).get("id")).intValue();
@@ -83,23 +87,23 @@ class MoneyTransferServletTest extends MockedBaseServlet {
     void accountHolderServletTest2() throws Exception {
 
         // create account 1
-        super.mockPOST("{\"type\": \"CHECKING\", \"accountHolder\": {\"id\": " + accountHolderId1 + "}}");
-        accountServlet().doPost(request, response);
+        http.mockPOST("{\"type\": \"CHECKING\", \"accountHolder\": {\"id\": " + accountHolderId1 + "}}");
+        accountServlet().doPost(http.getRequest(), http.getResponse());
 
         // create account 1
-        super.mockPOST("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + accountHolderId1 + "}}");
-        accountServlet().doPost(request, response);
+        http.mockPOST("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + accountHolderId1 + "}}");
+        accountServlet().doPost(http.getRequest(), http.getResponse());
 
         // create account 1
-        super.mockPOST("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + accountHolderId2 + "}}");
-        accountServlet().doPost(request, response);
+        http.mockPOST("{\"type\": \"SAVING\", \"accountHolder\": {\"id\": " + accountHolderId2 + "}}");
+        accountServlet().doPost(http.getRequest(), http.getResponse());
 
         // get all accounts (i.e. three of them)
-        super.mockGET("/account", new HashMap<>());
-        accountServlet().doGet(request, response);
+        http.mockGET("/account", new HashMap<>());
+        accountServlet().doGet(http.getRequest(), http.getResponse());
 
-        printWriter.flush();
-        HashMap accounts = new Gson().fromJson(responseWriter.toString(), HashMap.class);
+        http.getPrintWriter().flush();
+        HashMap accounts = new Gson().fromJson(http.getResponseWriter().toString(), HashMap.class);
 
         Assertions.assertEquals(3, accounts.size());
 
@@ -118,20 +122,20 @@ class MoneyTransferServletTest extends MockedBaseServlet {
     @Test
     void accountHolderServletTest3() throws Exception {
 
-        super.mockPOST("{\"accountTo\": " + accountNumbers.get(0) + ", \"amount\": 1000 }");
-        moneyTransferServlet().doPost(request, response);
+        http.mockPOST("{\"accountTo\": " + accountNumbers.get(0) + ", \"amount\": 1000 }");
+        moneyTransferServlet().doPost(http.getRequest(), http.getResponse());
 
-        super.mockPOST("{\"accountFrom\": " + accountNumbers.get(0) + ", \"accountTo\": " + accountNumbers.get(1) + ", \"amount\": 7.77 }");
-        moneyTransferServlet().doPost(request, response);
+        http.mockPOST("{\"accountFrom\": " + accountNumbers.get(0) + ", \"accountTo\": " + accountNumbers.get(1) + ", \"amount\": 7.77 }");
+        moneyTransferServlet().doPost(http.getRequest(), http.getResponse());
 
         // get all money transfers from firs account
         HashMap<String, String> params = new HashMap<>();
         params.put("accountNumber", accountNumbers.get(0).toString());
-        super.mockGET("/account", params);
-        accountServlet().doGet(request, response);
+        http.mockGET("/account", params);
+        accountServlet().doGet(http.getRequest(), http.getResponse());
 
-        printWriter.flush();
-        Account account = new Gson().fromJson(responseWriter.toString(), Account.class);
+        http.getPrintWriter().flush();
+        Account account = new Gson().fromJson(http.getResponseWriter().toString(), Account.class);
 
         // assert
         Assertions.assertTrue(account != null);
@@ -150,20 +154,20 @@ class MoneyTransferServletTest extends MockedBaseServlet {
     void accountHolderServletTest4() throws Exception {
 
         // 1. execute transfer from second to third account
-        super.mockPOST("{\"accountFrom\": " + accountNumbers.get(1) + ", \"accountTo\": " + accountNumbers.get(2) + ", \"amount\": 10 }");
-        moneyTransferServlet().doPost(request, response);
+        http.mockPOST("{\"accountFrom\": " + accountNumbers.get(1) + ", \"accountTo\": " + accountNumbers.get(2) + ", \"amount\": 10 }");
+        moneyTransferServlet().doPost(http.getRequest(), http.getResponse());
 
-        printWriter.flush();
-        Assertions.assertNotNull(responseWriter.toString());
+        http.getPrintWriter().flush();
+        Assertions.assertNotNull(http.getResponseWriter().toString());
 
         // 2. get all money transfers from second account (balance should stay 7.77)
         HashMap<String, String> params = new HashMap<>();
         params.put("accountNumber", accountNumbers.get(1).toString());
-        super.mockGET("/account", params);
-        accountServlet().doGet(request, response);
+        http.mockGET("/account", params);
+        accountServlet().doGet(http.getRequest(), http.getResponse());
 
-        printWriter.flush();
-        Account account = new Gson().fromJson(responseWriter.toString(), Account.class);
+        http.getPrintWriter().flush();
+        Account account = new Gson().fromJson(http.getResponseWriter().toString(), Account.class);
 
         Assertions.assertNotNull(account);
         Assertions.assertEquals(
@@ -173,11 +177,11 @@ class MoneyTransferServletTest extends MockedBaseServlet {
         // 3. get all money transfers from third account (balance should stay 0.00)
         params = new HashMap<>();
         params.put("accountNumber", accountNumbers.get(2).toString());
-        super.mockGET("/account", params);
-        accountServlet().doGet(request, response);
+        http.mockGET("/account", params);
+        accountServlet().doGet(http.getRequest(), http.getResponse());
 
-        printWriter.flush();
-        account = new Gson().fromJson(responseWriter.toString(), Account.class);
+        http.getPrintWriter().flush();
+        account = new Gson().fromJson(http.getResponseWriter().toString(), Account.class);
 
         Assertions.assertNotNull(account);
         Assertions.assertEquals(

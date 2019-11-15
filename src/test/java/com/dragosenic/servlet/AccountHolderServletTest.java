@@ -1,5 +1,6 @@
 package com.dragosenic.servlet;
 
+import com.dragosenic.HttpMock;
 import com.dragosenic.MockedBaseServlet;
 import com.dragosenic.data.InMemoryDB;
 import com.dragosenic.eBank.ElectronicBanking;
@@ -17,24 +18,27 @@ class AccountHolderServletTest extends MockedBaseServlet {
 
     private AccountHolderServlet sccountHolderServlet() {
         return new AccountHolderServlet() {
-            public ServletContext getServletContext() { return servletContext; }
+            public ServletContext getServletContext() { return http.getServlet().getServletContext(); }
         };
     }
+
+    private static HttpMock http;
 
     @BeforeAll
     static void initDB() {
         MockedBaseServlet.eB = new ElectronicBanking(new InMemoryDB());
+        http = new HttpMock(MockedBaseServlet.eB);
     }
 
     @Test
     void accountHolderServletTest1() throws Exception {
 
         // create account holder 1
-        super.mockPOST("{\"fullName\": \"John Lennon\", \"emailPhoneAddress\": \"john@lennon.com\"}");
-        sccountHolderServlet().doPost(request, response);
+        http.mockPOST("{\"fullName\": \"John Lennon\", \"emailPhoneAddress\": \"john@lennon.com\"}");
+        sccountHolderServlet().doPost(http.getRequest(), http.getResponse());
 
-        printWriter.flush();
-        Map result = new Gson().fromJson(responseWriter.toString(), Map.class);
+        http.getPrintWriter().flush();
+        Map result = new Gson().fromJson(http.getResponseWriter().toString(), Map.class);
 
         // assert
         Assertions.assertTrue(result.containsKey("accountHolderId"));
@@ -45,15 +49,15 @@ class AccountHolderServletTest extends MockedBaseServlet {
     void accountHolderServletTest2() throws Exception {
 
         // create account holder 2
-        super.mockPOST("{\"fullName\": \"Paul McCartney\", \"emailPhoneAddress\": \"paul@mcca.co.uk\"}");
-        sccountHolderServlet().doPost(request, response);
+        http.mockPOST("{\"fullName\": \"Paul McCartney\", \"emailPhoneAddress\": \"paul@mcca.co.uk\"}");
+        sccountHolderServlet().doPost(http.getRequest(), http.getResponse());
 
         // get all account holders (i.e. two of them)
-        super.mockGET("/account-holder", new HashMap<>());
-        sccountHolderServlet().doGet(request, response);
+        http.mockGET("/account-holder", new HashMap<>());
+        sccountHolderServlet().doGet(http.getRequest(), http.getResponse());
 
-        printWriter.flush();
-        ArrayList result = new Gson().fromJson(responseWriter.toString(), ArrayList.class);
+        http.getPrintWriter().flush();
+        ArrayList result = new Gson().fromJson(http.getResponseWriter().toString(), ArrayList.class);
 
         // assert
         Assertions.assertEquals(2, result.size());

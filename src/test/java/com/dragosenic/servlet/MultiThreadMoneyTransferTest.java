@@ -1,6 +1,8 @@
 package com.dragosenic.servlet;
 
+import com.dragosenic.HttpMock;
 import com.dragosenic.MockedBaseServlet;
+import com.dragosenic.TransferRunner;
 import com.dragosenic.data.InMemoryDB;
 import com.dragosenic.model.Account;
 import com.dragosenic.eBank.ElectronicBanking;
@@ -12,8 +14,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -21,21 +21,27 @@ import java.util.HashMap;
 
 class MultiThreadMoneyTransferTest extends MockedBaseServlet {
 
-    private AccountHolderServlet accountHolderServlet() {
+    private AccountHolderServlet accountHolderServlet(HttpMock http) {
         return new AccountHolderServlet() {
-            public ServletContext getServletContext() { return servletContext; }
+            public ServletContext getServletContext() {
+                return http.getServlet().getServletContext();
+            }
         };
     }
 
-    private AccountServlet accountServlet() {
+    private AccountServlet accountServlet(HttpMock http) {
         return new AccountServlet() {
-            public ServletContext getServletContext() { return servletContext; }
+            public ServletContext getServletContext() {
+                return http.getServlet().getServletContext();
+            }
         };
     }
 
-    private MoneyTransferServlet moneyTransferServlet() {
+    private MoneyTransferServlet moneyTransferServlet(HttpMock http) {
         return new MoneyTransferServlet() {
-            public ServletContext getServletContext() { return servletContext; }
+            public ServletContext getServletContext() {
+                return http.getServlet().getServletContext();
+            }
         };
     }
 
@@ -44,20 +50,23 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
 
     private static final int ACCOUNTS_COUNT = 10;   // <- number of randomly created testing accounts
     private static final int INITIAL_DEPOSIT = 20;  // <- initial amount to deposit to all accounts
-    private static final int TRANSFERS_COUNT_PER_THREAD = 200;  // <- number of random money transfers to execute per thread
-    private static final int NUMBER_OF_THREADS = 5; // <- relevant only to test 4
+    private static final int TRANSFERS_PER_THREAD = 100;  // <- number of random money transfers to execute per thread
+    private static final int NUMBER_OF_THREADS = 20; // <- relevant only to test 4
 
     private static final String mutex = "x";
+
+    private static HttpMock httpMock;
 
     @BeforeAll
     static void initDB() {
         MockedBaseServlet.eB = new ElectronicBanking(new InMemoryDB());
+        httpMock = new HttpMock(MockedBaseServlet.eB);
     }
 
     /**
-     *  Create 4 account holders
+     * Create 4 account holders
      *
-     *  @throws Exception
+     * @throws Exception
      */
     @Test
     void multiThreadMoneyTransferTest1() throws Exception {
@@ -70,16 +79,17 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
 
         // create account holders
         for (String[] testd : testdata) {
-            super.mockPOST("{\"fullName\": \"" + testd[0] + "\", \"emailPhoneAddress\": \"" + testd[1] + "\"}");
-            accountHolderServlet().doPost(request, response);
+            httpMock.mockPOST("{\"fullName\": \"" + testd[0] + "\", \"emailPhoneAddress\": \"" + testd[1] + "\"}");
+            accountHolderServlet(httpMock).doPost(httpMock.getRequest(), httpMock.getResponse());
         }
 
         // get all account holders (i.e. four of them)
-        super.mockGET("/account-holder", new HashMap<>());
-        accountHolderServlet().doGet(request, response);
+        httpMock.mockGET("/account-holder", new HashMap<>());
+        accountHolderServlet(httpMock).doGet(httpMock.getRequest(), httpMock.getResponse());
 
-        printWriter.flush();
-        ArrayList accountHolders = new Gson().fromJson(responseWriter.toString(), ArrayList.class);
+
+        httpMock.getPrintWriter().flush();
+        ArrayList accountHolders = new Gson().fromJson(httpMock.getResponseWriter().toString(), ArrayList.class);
 
         accountHolderIds = new ArrayList<>();
         for (Object accountHolder : accountHolders) {
@@ -90,9 +100,9 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
     }
 
     /**
-     *  Create ACCOUNTS_COUNT different accounts
+     * Create ACCOUNTS_COUNT different accounts
      *
-     *  @throws Exception
+     * @throws Exception
      */
     @Test
     void multiThreadMoneyTransferTest2() throws Exception {
@@ -100,47 +110,47 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         String[] testdata = {"CHECKING", "CLASSIC", "SAVING", "BROKERAGE"};
 
         for (int i = 0; i < ACCOUNTS_COUNT; i++) {
-            int randomAccountHolderId = accountHolderIds.get(RND.generateRandomInteger(0,accountHolderIds.size() - 1));
-            String randomAccountType = testdata[RND.generateRandomInteger(0,testdata.length - 1)];
+            int randomAccountHolderId = accountHolderIds.get(RND.generateRandomInteger(0, accountHolderIds.size() - 1));
+            String randomAccountType = testdata[RND.generateRandomInteger(0, testdata.length - 1)];
 
-            super.mockPOST("{\"type\": \"" + randomAccountType + "\", \"accountHolder\": {\"id\": " + randomAccountHolderId + "}}");
-            accountServlet().doPost(request, response);
+            httpMock.mockPOST("{\"type\": \"" + randomAccountType + "\", \"accountHolder\": {\"id\": " + randomAccountHolderId + "}}");
+            accountServlet(httpMock).doPost(httpMock.getRequest(), httpMock.getResponse());
         }
 
         // get all accounts
-        super.mockGET("/account", new HashMap<>());
-        accountServlet().doGet(request, response);
+        httpMock.mockGET("/account", new HashMap<>());
+        accountServlet(httpMock).doGet(httpMock.getRequest(), httpMock.getResponse());
 
-        printWriter.flush();
-        HashMap accounts = new Gson().fromJson(responseWriter.toString(), HashMap.class);
+        httpMock.getPrintWriter().flush();
+        HashMap accounts = new Gson().fromJson(httpMock.getResponseWriter().toString(), HashMap.class);
 
         Assertions.assertEquals(ACCOUNTS_COUNT, accounts.size());
 
         accountNumbers = new ArrayList<Integer>();
         for (Object accountNumber : accounts.keySet()) {
-            accountNumbers.add(Integer.parseInt((String)accountNumber));
+            accountNumbers.add(Integer.parseInt((String) accountNumber));
         }
     }
 
     /**
-     *  Deposit the same amount of INITIAL_DEPOSIT to all accounts
+     * Deposit the same amount of INITIAL_DEPOSIT to all accounts
      *
-     *  @throws Exception
+     * @throws Exception
      */
     @Test
     void multiThreadMoneyTransferTest3() throws Exception {
 
         for (Integer accountNumber : accountNumbers) {
-            super.mockPOST("{\"accountTo\": " + accountNumber + ", \"amount\": " + INITIAL_DEPOSIT + " }");
-            moneyTransferServlet().doPost(request, response);
+            httpMock.mockPOST("{\"accountTo\": " + accountNumber + ", \"amount\": " + INITIAL_DEPOSIT + " }");
+            moneyTransferServlet(httpMock).doPost(httpMock.getRequest(), httpMock.getResponse());
         }
 
         // get all accounts
-        super.mockGET("/account", new HashMap<>());
-        accountServlet().doGet(request, response);
+        httpMock.mockGET("/account", new HashMap<>());
+        accountServlet(httpMock).doGet(httpMock.getRequest(), httpMock.getResponse());
 
-        printWriter.flush();
-        HashMap accounts = new Gson().fromJson(responseWriter.toString(), HashMap.class);
+        httpMock.getPrintWriter().flush();
+        HashMap accounts = new Gson().fromJson(httpMock.getResponseWriter().toString(), HashMap.class);
 
         Assertions.assertEquals(ACCOUNTS_COUNT, accounts.size());
 
@@ -148,11 +158,11 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         for (Integer accountNumber : accountNumbers) {
             HashMap<String, String> params = new HashMap<>();
             params.put("accountNumber", accountNumber.toString());
-            super.mockGET("/account", params);
-            accountServlet().doGet(request, response);
+            httpMock.mockGET("/account", params);
+            accountServlet(httpMock).doGet(httpMock.getRequest(), httpMock.getResponse());
 
-            printWriter.flush();
-            Account account = new Gson().fromJson(responseWriter.toString(), Account.class);
+            httpMock.getPrintWriter().flush();
+            Account account = new Gson().fromJson(httpMock.getResponseWriter().toString(), Account.class);
 
             Assertions.assertNotNull(account);
             Assertions.assertEquals(new BigDecimal(INITIAL_DEPOSIT + ".00"), account.getBalance());
@@ -173,8 +183,10 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
 
         for (int i = 0; i < NUMBER_OF_THREADS; i++) {
             threads.add(new Thread(() -> {
+                TransferRunner transferRunnerThreadSpecific = new TransferRunner(INITIAL_DEPOSIT);
                 System.out.println(String.format("started %s", Thread.currentThread().getName()));
-                executeRandomMoneyTransfers(TRANSFERS_COUNT_PER_THREAD);
+                transferRunnerThreadSpecific.executeRandomMoneyTransfers(
+                        TRANSFERS_PER_THREAD, accountNumbers, new HttpMock(MockedBaseServlet.eB));
             }));
         }
 
@@ -187,11 +199,11 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         }
 
         // get all accounts
-        super.mockGET("/account", new HashMap<>());
-        accountServlet().doGet(request, response);
+        httpMock.mockGET("/account", new HashMap<>());
+        accountServlet(httpMock).doGet(httpMock.getRequest(), httpMock.getResponse());
 
-        printWriter.flush();
-        HashMap accounts = new Gson().fromJson(responseWriter.toString(), HashMap.class);
+        httpMock.getPrintWriter().flush();
+        HashMap accounts = new Gson().fromJson(httpMock.getResponseWriter().toString(), HashMap.class);
 
         Assertions.assertEquals(ACCOUNTS_COUNT, accounts.size());
 
@@ -200,11 +212,11 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
         for (int i = 0; i < accountNumbers.size(); i++) {
             HashMap<String, String> params = new HashMap<>();
             params.put("accountNumber", accountNumbers.get(i).toString());
-            super.mockGET("/account", params);
-            accountServlet().doGet(request, response);
+            httpMock.mockGET("/account", params);
+            accountServlet(httpMock).doGet(httpMock.getRequest(), httpMock.getResponse());
 
-            printWriter.flush();
-            Account account = new Gson().fromJson(responseWriter.toString(), Account.class);
+            httpMock.getPrintWriter().flush();
+            Account account = new Gson().fromJson(httpMock.getResponseWriter().toString(), Account.class);
 
             Assertions.assertNotNull(account);
             Assertions.assertTrue(account.getBalance().compareTo(BigDecimal.ZERO) != -1); // <- no account balance will bi lees then zero
@@ -219,6 +231,7 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
 
     }
 
+/*
     private void executeRandomMoneyTransfers(int moneyTransfersCount) {
 
         try {
@@ -234,10 +247,10 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
                         randomAccountNumberTo = accountNumbers.get(RND.generateRandomInteger(0, accountNumbers.size() - 1));
                     } while (randomAccountNumberFrom == randomAccountNumberTo);
 
-                    super.mockPOST("{\"accountFrom\": " + randomAccountNumberFrom +
+                    httpMock.mockPOST("{\"accountFrom\": " + randomAccountNumberFrom +
                             ", \"accountTo\": " + randomAccountNumberTo +
                             ", \"amount\": " + randomAmountToTransfer + "}");
-                    moneyTransferServlet().doPost(request, response);
+                    moneyTransferServlet(httpMock).doPost(httpMock.getRequest(), httpMock.getResponse());
                 }
             }
 
@@ -245,6 +258,6 @@ class MultiThreadMoneyTransferTest extends MockedBaseServlet {
             e.printStackTrace();
         }
 
-    }
+    } */
 
 }
