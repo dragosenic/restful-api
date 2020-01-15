@@ -1,6 +1,6 @@
 ## Simple Java RESTful API
 
-Simple Java RESTful API for money transfers between accounts.
+Simple Java RESTful API for money transfers between accounts, with in-memory (non persistent) data store.  
 Standalone executable program with jetty server.
 
 To clone source code
